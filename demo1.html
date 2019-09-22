@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajax-GET</title>
+</head>
+<body>
+<label for="user-id">输入用户ID:</label>
+<input type="text" id="user-id" name="user_id" autofocus>
+<p id="tips"></p>
+
+    <script>
+        var userId = document.getElementById("user-id");
+    
+        var tips = document.getElementById("tips");
+        
+        var request = new XMLHttpRequest();
+        
+        userId.addEventListener("keypress",getUserInfo,false);
+        
+        function getUserInfo(ev){
+            if(ev.key  === 'Enter'){
+                switch(true){
+                    case userId.value.length ===0:
+                        tips.innerHTML = '<span style="color:red">ID不能为空</span>';
+                        return false;
+                    case isNaN(userId.value):
+                        tips.innerHTML = '<span style="color:red">必须为数字</span>';
+                        return false;
+                    default: 
+                        request.addEventListener("readystatechange",successResponse, false); 
+                    
+                        var data = encodeURIComponent(userId.value);
+                        
+                        request.open("get","php/user_info.php?user_id="+data,true);
+        
+                        request.send(null);
+                }
+            }
+        }
+        
+       
+        
+        
+        function successResponse(ev){
+            if (request.readyState === 4) {
+            tips.innerHTML = request.responseText;
+        }
+        }
+        
+    </script>
+    
+    
+<script>
+//    // user-id
+//    var input = document.getElementById('user-id');
+//    // tips
+//    var tips = document.getElementById('tips');
+//    // 1. 创建: 请求对象
+//    var request = new XMLHttpRequest();
+//
+//    input.addEventListener('keypress', getUserInfo, false);
+//
+//    // 事件方法
+//    function getUserInfo(ev) {
+//        if (ev.key === 'Enter') {
+//            // 根据用户输入的内容进行判断
+//            switch (true) {
+//                // 判断是否为空?
+//                case input.value.length === 0:
+//                    tips.innerHTML = '<span style="color:red">ID不为能空</span>';
+//                    return false;
+//                // 判断是否是整数?
+//                case isNaN(input.value):
+//                    tips.innerHTML = '<span style="color:red">ID必须是整数</span>';
+//                    return false;
+//                    // 当数据全部合法后, 进入Ajax异步执行
+//                default:
+//                    // 2. 监听: 成功回调
+//                    request.addEventListener('readystatechange', successCallback, false);
+//
+//                    // 3. 设置: 请求参数
+//                    var data = encodeURIComponent(input.value);
+//                    request.open('GET', 'php/user_info.php?user_id='+data, true);
+//
+//                    // 4. 发送: 异步请求
+//                    request.send(null);
+//            }
+//        }
+//    }
+//
+//
+//    // 成功的回调函数
+//    function successCallback(ev) {
+//        // 当请求成功并且数据成功的时候执行
+//        if (request.readyState === 4) {
+//            tips.innerHTML = request.responseText;
+//        }
+//    }
+//
+//    input.addEventListener('input', function (ev) {
+//        tips.innerHTML = null;
+//    },false);
+</script>
+</body>
+</html>

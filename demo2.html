@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajax表单验证</title>
+</head>
+<body>
+<!-- 登录表单 -->
+<h2>用户登录</h2>
+<form action="" name="login">
+    <p>
+        <label for="username">用户:</label>
+        <input type="text" name="username" id="username" placeholder="UserName">
+    </p>
+    <p>
+        <label for="email">邮箱:</label>
+        <input type="text" name="email" id="email" placeholder="example@email.com">
+    </p>
+    <p>
+        <label for="password">密码:</label>
+        <input type="password" name="password" id="password" placeholder="******" >
+    </p>
+    <p>
+        <label for="remember">记住我:</label>
+        <select name="remember" id="remember">
+            <option value="1" selected>一天</option>
+            <option value="7">一星期</option>
+            <option value="30">一个月</option>
+        </select>
+    </p>
+    <p>
+        <button type="button" name="submit">提交</button>
+    </p>
+</form>
+
+<script>
+    // 1. 获取相关表单元素
+    // 整个表单
+    var login = document.forms.namedItem("login");
+    // 按钮
+   var btn= login.submit;
+    
+    // 1. 创建: 请求对象
+   var request= new XMLHttpRequest();
+
+    // 2 对表单数据进行验证
+   login.username.addEventListener("blur",isEmpty,false);
+    login.email.addEventListener("blur",isEmpty,false);
+    login.password.addEventListener("blur",isEmpty,false);
+    
+         function isEmpty(ev){ 
+             if(ev.target.value.length === 0 ){
+                 if(ev.target.nextElementSibling === null){
+                     var tips = document.createElement("span");
+                     tips.style.color = "red";
+                     
+                     switch(ev.target.name){
+                         case "username":
+                           tips.innerHTML="用户名不能为空";  
+                            break;
+                         case "email":
+                             tips.innerHTML = "邮箱不能为空";
+                             break;
+                         case "password":
+                             tips.innerHTML = "密码不能为空";
+                             break;
+                         default:
+                             tips.innerHTML = "未知错误";
+                     }
+                     ev.target.parentNode.appendChild(tips);
+                 }
+                 ev.target.focus();
+                 
+             }
+         }
+    
+        
+    // 3. 当用户开始输入数据的时候,清空提示信息
+    login.username.addEventListener("input",clear,false);
+    login.email.addEventListener("input",clear,false);
+    login.password.addEventListener("input",clear,false);
+
+    function clear(ev){
+        var tips = ev.target.nextElementSibling;
+        if(tips != null){
+            ev.target.parentNode.removeChild(tips);
+        }
+    }
+    // 4. Ajax验证
+    
+    btn.addEventListener("click",check,false);
+    
+    function check(ev){
+        
+        var username = login.username.value;
+        var email = login.email.value;
+        var password = login.password.value;
+        var remember = login.remember.value;
+        
+         // 当没有输入的时候,禁止提交
+        if(username.length === 0 || email.length === 0 || password.length === 0 || remember.length === 0){
+                     // 移除点击事件
+            btn.removeEventListener("click",check,false);
+            
+            // 事件模拟器:blur
+            var blurEvent= new Event("click");
+            login.username.dispatchEvent(blurEvent);
+            return false;
+           }
+    } 
+ 
+
+        
+          // 2. 监听: 成功回调
+        request.addEventListener("readyStateChange",successCallback,false); 
+  
+       // 3. 设置: 请求参数
+        request.open('POST', 'php/check.php', true); 
+    
+//        // 因为是POST,设置请求头,模拟表单数据格式进行发送: 键值对
+        request.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=utf-8');
+       
+    
+    var data = 'username='+username+'&email='+email+'&password='+password+'&remember='+remember;
+    request.send(data);
+   
+    
+    
+    function successCallback(ev) {
+        if (request.readyState === 4) {
+            console.log(request.responseText);
+        }
+    }
+        
+   
+    
+    
+    
+</script>
+    <script>
+//    
+//     // 1. 获取相关表单元素
+//    // 整个表单
+//    var login = document.forms.namedItem('login');
+//    // 按钮
+//    var btn = login.submit;
+//    // 1. 创建: 请求对象
+//    var request = new XMLHttpRequest();
+//
+//    // 2 对表单数据进行验证
+//    login.username.addEventListener('blur', isEmpty, false);
+//    login.email.addEventListener('blur', isEmpty, false);
+//    login.password.addEventListener('blur', isEmpty, false);
+//
+//    // 非空验证方法
+//    function isEmpty(ev) {
+//        if (ev.target.value.length === 0) {
+//            // 1. 创建非空验证的提示信息
+//            if (ev.target.nextElementSibling === null) {
+//                var tips = document.createElement('span');
+//                tips.style.color = 'red';
+//
+//                // 根据事件目标设置提示信息
+//                switch (ev.target.name) {
+//                    case 'username':
+//                        tips.innerText = '用户名不能为空';
+//                        break;
+//                    case 'email':
+//                        tips.innerText = '邮箱不能为空';
+//                        break;
+//                    case 'password':
+//                        tips.innerText = '密码不能为空';
+//                        break;
+//                    default:
+//                        tips.innerText = '未定义错误';
+//                }
+//
+//                ev.target.parentNode.appendChild(tips);
+//            }
+//
+//            // 将焦点锁定到错误数据上
+//            ev.target.focus();
+//        }
+//    }
+//
+//    // 3. 当用户开始输入数据的时候,清空提示信息
+//    login.username.addEventListener('input', clearTips, false);
+//    login.email.addEventListener('input', clearTips, false);
+//    login.password.addEventListener('input', clearTips, false);
+//
+//    function clearTips(ev) {
+//        var tips = ev.target.nextElementSibling;
+//        if (tips !== null) {
+//            tips.parentNode.removeChild(tips);
+//        }
+//    }
+//
+//    // 4. Ajax验证
+//    btn.addEventListener('click', check, false);
+//
+//    // click
+//    function check(ev) {
+//        // 拿到所有需要提交的数据
+//        var username = login.username.value;
+//        var email = login.email.value;
+//        var password = login.password.value;
+//        var remember = login.remember.value;
+//
+//        // 当没有输入的时候,禁止提交
+//        if (username.length === 0 || email.length === 0 || password.length === 0) {
+//            // 移除点击事件
+//            btn.removeEventListener('click', check, false);
+//
+//            // 事件模拟器:blur
+//            var blurEvent = new Event('blur');
+//            login.username.dispatchEvent(blurEvent);
+//            return false;
+//        }
+//
+//        // 2. 监听: 成功回调
+//        request.addEventListener('readystatechange', successCallback, false);
+//
+//        // 3. 设置: 请求参数
+//        request.open('POST', 'php/check.php', true);
+//
+//        // 因为是POST,设置请求头,模拟表单数据格式进行发送: 键值对
+//        request.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=utf-8');
+//
+//        // 4. 发送: 异步请求
+//        var data = 'username='+username+'&email='+email+'&password='+password+'&remember='+remember;
+//        request.send(data);
+//    }
+//    
+//    
+//    function successCallback(ev) {
+//        if (request.readyState === 4) {
+//            console.log(request.responseText);
+//        }
+//    }
+    </script>
+</body>
+</html>
